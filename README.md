@@ -8,3 +8,8 @@ To access fast api client:
 To access qdrant
     -> http://localhost:6333/dashboard
     ->
+    
+<div align="center">
+  <img src="https://shields.io" alt="Work In Progress" />
+  <p><i>This project is a work in progress. Please use with caution as breaking changes may occur.</i></p>
+</div>
