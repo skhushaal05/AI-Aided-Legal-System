@@ -3,6 +3,7 @@ from qdrant_client import QdrantClient
 
 ollama = Client(host="http://localhost:11434")
 
+
 qdrant = QdrantClient(
     host="localhost",
     port=6333
@@ -50,8 +51,7 @@ Heading:
 """
 
     prompt = f"""
-You are a POSH Act legal assistant.
-
+You are a POSH Act legal assistant working with internal complaints committee.
 Answer ONLY from the supplied context.
 
 Context:
@@ -69,7 +69,7 @@ Answer:
         model=CHAT_MODEL,
         messages=[
             {
-                "role": "user",
+                "role": "assistant",
                 "content": prompt
             }
         ]

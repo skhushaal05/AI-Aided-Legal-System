@@ -7,4 +7,5 @@ To access fast api client:
 
 To access qdrant
     -> http://localhost:6333/dashboard
-    ->
+    -> Raw_Law_Extractors > posh > posh_chunking.py # create chunks.
+    -> qdrant_script > ingest_chunks.py #store them in qdrant storage.
