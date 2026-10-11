@@ -1,3 +1,13 @@
+Setup
+    -> create python venv -> python -m venv .venv(and activate it)
+    -> install requiremnts -> pip install -r requirements.txt
+    -> add .env file
+    -> install docker  
+        -> run docker-compose services
+        following commands inside docker ollama cli
+        -> ollama pull nomic-embed-text:latest
+        -> ollama pull llama3.2:1b
+
 Make sure that Docker is running
 
 To access fast api client:

@@ -84,13 +84,7 @@ def classify_query(state: GraphState) -> GraphState:
     """Use the LLM to decide if the question is about PoSH / sexual harassment workplace law."""
     history_str = format_history(state.get("chat_history", []))
 
-    classification_prompt = f"""You are a workplace safety and legal query classifier. Your ONLY job is to decide whether the user's message relates to ANY of the following:
-
-- Workplace harassment or sexual harassment
-- Inappropriate behavior by a boss, manager, or colleague (e.g., unwanted touching, inappropriate comments, uncomfortable situations)
-- The POSH Act (Prevention of Sexual Harassment) or Internal Complaints Committee (ICC)
-- Reporting misconduct at work
-
+    classification_prompt = f"""You are a classifier. Your ONLY job is to decide if the user is asking about mental or physical or sexual harrasment or workplace harrasment or any simmilar related question
     Conversation History:
     {history_str}
 
