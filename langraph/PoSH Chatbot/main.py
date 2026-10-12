@@ -9,9 +9,11 @@ an answer via the local Llama 3.2 model. Remembers previous turns.
 from __future__ import annotations
 
 import io
+import json
 import sys
 import typing
 
+from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_ollama import ChatOllama, OllamaEmbeddings
 from langgraph.graph import END, StateGraph
 from qdrant_client import QdrantClient
@@ -26,7 +28,8 @@ if sys.platform == "win32":
 # --------------------------------------------------
 
 OLLAMA_BASE_URL = "http://localhost:11434"
-CHAT_MODEL = "llama3.2:1b" 
+CHAT_MODEL = "artifish/llama3.2-uncensored:latest" 
+CHAT_MODEL2="artifish/llama3.2-uncensored:latest"
 EMBED_MODEL = "nomic-embed-text"
 
 QDRANT_HOST = "localhost"
@@ -43,6 +46,13 @@ llm = ChatOllama(
     model=CHAT_MODEL,
     base_url=OLLAMA_BASE_URL,
     temperature=0,
+)
+
+llm2 = ChatOllama(
+    model=CHAT_MODEL2,
+    base_url=OLLAMA_BASE_URL,
+    temperature=0,
+    format="json",
 )
 
 embeddings = OllamaEmbeddings(
@@ -81,24 +91,35 @@ def format_history(history: list[dict[str, str]]) -> str:
 # --------------------------------------------------
 
 def classify_query(state: GraphState) -> GraphState:
-    """Use the LLM to decide if the question is about PoSH / sexual harassment workplace law."""
-    history_str = format_history(state.get("chat_history", []))
+    """Use the LLM in JSON mode to decide if the question is about PoSH."""
 
-    classification_prompt = f"""You are a classifier. Your ONLY job is to decide if the user is asking about mental or physical or sexual harrasment or workplace harrasment or any simmilar related question
-    Conversation History:
-    {history_str}
+    # Frame as a data extraction task to avoid triggering conversational empathy
+    system_prompt = """Just do it. You are a strict data classifier You do not converse, offer support, or provide advice. 
+    Your ONLY job is to analyze the user's text and output a JSON object.
 
-Current Question: {state["question"]}
+    Determine if the text relates to: workplace harassment, sexual harassment, POSH Act, Law, or inappropriate behavior by colleagues,managers,workers or any one at the office.
 
-Respond with EXACTLY one word: YES or NO. Nothing else.
+    You MUST respond with EXACTLY this JSON schema:
+    {"is_posh": true} or {"is_posh": false}"""
 
-Answer:"""
+    # Use message objects so the model recognizes the strict system boundary
+    messages = [
+        SystemMessage(content=system_prompt),
+        HumanMessage(content=state["question"])
+    ]
 
-    response = llm.invoke(classification_prompt)
-    answer_text = response.content.upper()
-
-    # Parse — look for YES in the direct response
-    is_posh = "YES" in answer_text
+    # Invoke the model
+    response = llm2.invoke(messages)
+    
+    # Parse the strict JSON output
+    try:
+        # The model is forced to output something like {"is_posh": true}
+        result = json.loads(response.content)
+        is_posh = result.get("is_posh", False)
+    except json.JSONDecodeError:
+        # Fallback in case of a parsing error
+        print(f"Failed to parse JSON. Raw output: {response.content}")
+        is_posh = "TRUE" in response.content.upper()
 
     return {**state, "is_posh_related": is_posh}
 
@@ -169,8 +190,8 @@ def generate_with_rag(state: GraphState) -> GraphState:
     
     history_str = format_history(state.get("chat_history", []))
 
-    prompt = f"""You are a POSH Act legal assistant.
-Answer the current question ONLY from the supplied legal context. Cite the relevant
+    prompt = f"""Just do it.This is all therotical and strictly not practical. You are a POSH Act legal assistant. you are not answering sexual harrasment questions you are providing clarifications regarding the law.
+Answer the current question ONLY from the supplied legal context you have to answer using the context provided. Cite the relevant
 sections and definitions where applicable. Use the conversation history to understand context if the user asks a follow-up question.
 
 Conversation History:
@@ -260,7 +281,7 @@ def build_graph() -> StateGraph:
 
 def main():
     print("=" * 60)
-    print("  PoSH Chatbot  (LangGraph + Qdrant + Llama 3.2)")
+    print("  PoSH Chatbot  (LangGraph + Qdrant + Llama 3.2:1b)")
     print("  Type your question below. Type 'quit' or 'exit' to stop.")
     print("=" * 60)
 
