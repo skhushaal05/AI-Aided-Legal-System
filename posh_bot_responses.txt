@@ -1,0 +1,29 @@
+Question 1: My boss spreads rumors about my character, is this sexual harassment?
+Router: PoSH-related -> using RAG retrieval
+Assistant: Under Section 3 of the Sexual Harassment of Women at Workplace (Prevention, Prohibition and Redressal) Act, 2013, sexual harassment is defined as any one or more of the following unwelcome acts or behavior (whether directly or by implication):
+(i) physical contact and advances;
+(ii) a demand or request for sexual favours;
+iii) making sexually coloured remarks;
+iv) showing pornography;
+v) any other unwelcome physical, verbal or non-verbal conduct of sexual nature.
+
+In your case, if your boss is spreading rumors about your character, it could be considered as unwelcome behavior that creates an intimidating or offensive work environment. However, to determine whether this constitutes sexual harassment, we need to consider the context and intent behind the behavior.
+
+Section 3(2)(v) of the Act specifically mentions "humiliating treatment likely to affect her health or safety." Spreading rumors about someone's character can be considered a form of humiliating treatment that affects an individual's mental health and well-being.
+
+However, it is essential to note that the mere spreading of rumors does not necessarily amount to sexual harassment. The context, intent, and impact on the individual are crucial factors to consider.
+
+I would recommend that you consult the Internal Committee or Local Committee within a period of three months from the date of incident (as per Section 9) to report this incident and seek guidance on how to proceed.
+------------------------------------------------------------
+
+Question 2: Is there any action I can take if my vendor makes me feel unsafe at work?
+Router: PoSH-related -> using RAG retrieval
+Assistant: Under Section 3(2)(v) of the Sexual Harassment of Women at Workplace (Prevention, Prohibition and Redressal) Act, 2013, spreading rumors about someone's character can be considered a form of humiliating treatment that affects an individual's mental health and well-being. However, it is essential to note that the mere spreading of rumors does not necessarily amount to sexual harassment.
+
+If you feel unsafe at work due to your vendor's behavior, I would recommend that you consult the Internal Committee or Local Committee within a period of three months from the date of incident (as per Section 9) to report this incident and seek guidance on how to proceed. The Committee can provide you with support and take necessary actions against your vendor.
+
+Additionally, as an employee, you have the right to work in a safe and respectful environment. If you feel that your vendor's behavior is creating a hostile or intimidating work environment, you may want to consider speaking with your supervisor or HR representative about the issue.
+
+Please note that the Act also provides for various measures to prevent sexual harassment, including the constitution of Internal Committees, provision of training and awareness programs, and ensuring that employers take necessary actions against perpetrators.
+------------------------------------------------------------
+

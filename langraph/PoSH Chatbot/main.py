@@ -13,6 +13,7 @@ import json
 import sys
 import typing
 
+import pandas as pd
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_ollama import ChatOllama, OllamaEmbeddings
 from langgraph.graph import END, StateGraph
@@ -280,50 +281,105 @@ def build_graph() -> StateGraph:
 # --------------------------------------------------
 
 def main():
-    print("=" * 60)
-    print("  PoSH Chatbot  (LangGraph + Qdrant + Llama 3.2:1b)")
-    print("  Type your question below. Type 'quit' or 'exit' to stop.")
-    print("=" * 60)
-
-    graph = build_graph()
     
-    # Initialize an empty list for memory every time the script runs.
-    # This guarantees a fresh instance upon restart.
-    current_chat_history = [] 
+    graph = build_graph()
+# Load your generated graph
+    input_csv_path = "langraph/PoSH Chatbot/posh_chatbot_user_queries.csv"
+    output_txt_path = "posh_bot_responses.txt"
 
-    while True:
-        print()
-        question = input("You: ").strip()
+    # Load the questions from the CSV
+    df = pd.read_csv(input_csv_path)
+    questions_list = df['User_Input'].tolist()
 
-        if not question:
-            continue
+     
 
-        if question.lower() in ("quit", "exit"):
-            print("Goodbye!")
-            break
+    # Open the text file in write mode
+    with open(output_txt_path, "w", encoding="utf-8") as f:
+        for i, question in enumerate(questions_list, start=1):
+            question = str(question).strip()
+            if not question:
+                continue
 
-        # Pass the accumulated history into the graph state
-        initial_state: GraphState = {
-            "question": question,
-            "is_posh_related": False,
-            "context": "",
-            "answer": "",
-            "chat_history": current_chat_history
-        }
+            print(f"Processing Q{i}: {question}")
+            current_chat_history = []
+            
+            initial_state = {
+                "question": question,
+                "is_posh_related": False,
+                "context": "",
+                "answer": "",
+                "chat_history": current_chat_history
+            }
 
-        result = graph.invoke(initial_state)
+            # Invoke the LangGraph pipeline
+            result = graph.invoke(initial_state)
 
-        # Show routing decision
-        if result["is_posh_related"]:
-            print("\n  [Router] PoSH-related -> using RAG retrieval")
-        else:
-            print("\n  [Router] General question -> direct answer")
+            route_status = "PoSH-related -> using RAG retrieval" if result.get("is_posh_related") else "General question -> direct answer"
+            answer = result.get("answer", "")
 
-        print(f"\nAssistant: {result['answer']}")
+            # Write the question, routing decision, and answer to the text file
+            f.write(f"Question {i}: {question}\n")
+            f.write(f"Router: {route_status}\n")
+            f.write(f"Assistant: {answer}\n")
+            f.write("-" * 60 + "\n\n")
 
-        # Append the latest exchange to our memory for the next loop
-        current_chat_history.append({"role": "user", "content": question})
-        current_chat_history.append({"role": "assistant", "content": result["answer"]})
+            # Append the latest exchange to memory for the next iteration
+            current_chat_history.append({"role": "user", "content": question})
+            current_chat_history.append({"role": "assistant", "content": answer})
+
+            # Print the output to the console for testing visibility
+            print(f"Router: {route_status}")
+            print(f"Assistant: {answer}\n")
+
+            # Pause after the first 2 questions to check the output
+            if i == 2:
+                user_choice = input("Test complete for the first 2 questions. Continue processing the remaining 998? (y/n): ").strip().lower()
+                if user_choice != 'y':
+                    print("Stopping execution.")
+                    break
+                print("Continuing with the rest of the questions...\n")
+
+    print(f"\nProcessing complete. All results saved to {output_txt_path}")
+
+    # graph = build_graph()
+    
+    # # Initialize an empty list for memory every time the script runs.
+    # # This guarantees a fresh instance upon restart.
+    # current_chat_history = [] 
+
+    # while True:
+    #     print()
+    #     question = input("You: ").strip()
+
+    #     if not question:
+    #         continue
+
+    #     if question.lower() in ("quit", "exit"):
+    #         print("Goodbye!")
+    #         break
+
+    #     # Pass the accumulated history into the graph state
+    #     initial_state: GraphState = {
+    #         "question": question,
+    #         "is_posh_related": False,
+    #         "context": "",
+    #         "answer": "",
+    #         "chat_history": current_chat_history
+    #     }
+
+    #     result = graph.invoke(initial_state)
+
+    #     # Show routing decision
+    #     if result["is_posh_related"]:
+    #         print("\n  [Router] PoSH-related -> using RAG retrieval")
+    #     else:
+    #         print("\n  [Router] General question -> direct answer")
+
+    #     print(f"\nAssistant: {result['answer']}")
+
+    #     # Append the latest exchange to our memory for the next loop
+    #     current_chat_history.append({"role": "user", "content": question})
+    #     current_chat_history.append({"role": "assistant", "content": result["answer"]})
 
 
 if __name__ == "__main__":
